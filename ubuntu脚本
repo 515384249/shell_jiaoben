@@ -1,0 +1,81 @@
+172.31.201.118 bjtu xxzx1012_77
+xxzx1012_77
+update mysql.user set password=PASSWORD('123') where User='root';
+
+
+激活虚拟环境
+source /home/django/bin/activate
+退出虚拟环境
+deactivate
+
+
+ln -s /etc/nginx/sute-available.conf
+
+复制后
+
+参数-t测试有没有问题
+uwsgi 重新加载
+uwsgi --reload /home/myite_uwsgi/master.pid
+
+
+
+
+
+
+
+
+https://blog.csdn.net/Kernel_Heart/article/details/82455338
+
+
+
+mysql8.0 创建用户
+CREATE USER 'wcs'@'%' IDENTIFIED BY '123123';
+
+GRANT ALL PRIVILEGES ON *.* TO 'wcs'@'%'
+sudo apt-get install mysql-server mysql-client 
+ALTER USER 'wcs'@'%' IDENTIFIED WITH mysql_native_password BY '123123';
+flush privileges;
+
+
+
+
+
+ File "/usr/lib/python3/dist-packages/CommandNotFound/db/db.py", line 5, in <module>
+    import apt_pkg
+ModuleNotFoundError: No module named 'apt_pkg'
+
+
+sudo ln -s apt_pkg.cpython-{36m,37m}-x86_64-linux-gnu.so
+
+
+
+查看mysql是否在监 听端口命令
+netstat -tl | grep mysql
+会看到如下类似内容
+tcp 0 0 *:mysql *:* LISTEN
+
+其实有时mysql已经正 常启动了，查看mysql是否启动命令
+ps -aux | grep mysqld
+
+进入数据库
+mysql -uroot -p
+mysql -uroot -p
+mysql -uroot -p
+
+grant all privileges on *.* to "新用户名"@"%" identified by "新用户密码" with grant option;
+
+
+
+
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'tel_data',
+        'USER': 'root',
+        'PASSWORD': 'wincewf',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
+    }
+}
+
+grant all privileges on *.* to "wcs"@"%" identified by "666" with grant option;
+

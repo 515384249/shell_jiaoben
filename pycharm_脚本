@@ -1,0 +1,79 @@
+'''
+创建app
+'''
+python manage.py startapp testmodle
+
+
+'''
+运行内部服务器
+'''
+python manage.py runserver
+
+'''
+链接mysql数据库前要先在项目下的init文件里注册
+
+'''
+import pymysql
+
+pymysql.install_as_MySQLdb()
+'''
+运行数据库后更新
+'''
+python manage.py makemigrations @myappname
+
+python manage.py migrate   '''更新数据库表'''
+
+'''
+当你每次对模型进行增、删、修改时，请务必执行命令python manage.py migrate，
+让操作实际应用到数据库上。这里可以选择在执行migrate之前，
+先执行python manage.py makemigrations让修改动作保存到记录文件中，
+方便github等工具的使用。'''
+
+'''
+创建超级用户
+'''
+python manage.py createsuperuser
+
+
+'''
+查询django 版本
+
+
+'''
+python -m django --version
+
+'''
+更换端口
+'''
+python manage.py runserver 8080
+'''
+django链接mysql数据库，配置代码及脚本
+'''
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'my_web',
+        'USER': 'root',
+        'PASSWORD': 'password',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
+    }
+}
+
+
+'''django 数据库查询'''
+
+关于在django框架里取已登录用户名字的问题
+在 views里取值是这样的
+
+request.user.username
+
+
+而在模板页面取值是这样的：
+
+{{request.user}}
+
+判断是否通过验证是这样的
+{% if request.user.is_authenticated %}
+
+看似很简单其实很重要，切记切记

@@ -1,0 +1,26 @@
+ 项目所在的绝对路径
+chdir = /srv/tongxunlu
+socket = /srv/tongxunlu/tongxunlu.socket
+
+
+
+
+
+module = ProjectTongXunLu.wsgi    # mysite.wsgi:application   这是官方搞法
+# Python虚拟环境路径
+home = /root/.virtualenvs/env37tongxunlu
+
+# 主进程
+master = true
+# 最大数量的工作进程
+max-requests = 20
+processes = 4
+harakiri = 20
+harakiri-verbose = true
+# http = :80
+
+chmod-socket = 666
+# 退出的时候是否清理环境
+vacuum = true
+daemonize = /var/log/tongxunlu_uwsgi.log
+

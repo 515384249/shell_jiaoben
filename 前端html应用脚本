@@ -1,0 +1,86 @@
+html标签的多重继承
+
+base.html
+	<p> base 内容</p>
+	  {% block mainbody %}
+       <p>original</p>
+    {% endblock %}
+	
+	
+hello.html
+	{%extends "base.html" %}
+ 
+	{% block mainbody %}
+	<p>继承了 base.html 文件</p>
+	{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+css
+
+<link href="1.css' %}" rel="stylesheet" type="text/css"/>
+  <!-- rel表示连接到样式表，其值为stylesheet -->
+    <!-- type表示连接到样式表类型为css样式表
+		href指定了css样式表的文件路径，此处表示当前路径下名称为1.css
+	-->
+	
+	<!---内嵌 >  链接优先级 >  导入-->
+	
+	css选择器 可以选择 class ,id ,元素状态如  a:link
+	
+	标记选择器：
+	
+	
+	.classvalue{property:value}         类选择器
+	#idvalue{property:value}             id选择器
+	*全局选择器   *{property：value}
+	组合选择器  tagName.class Value{property：value}   一般用的重复出现且样式一样的标记里如 li ，td，dd
+	继承选择器：
+	
+	id选择器优先级  > 类
+	
+	
+	
+	
+js
+
+直接嵌入h5 需要加标记对  <script></script>
+引用外部文件时 <script src = 外部脚本文件路径></script>
+
+
+	function 函数名([参数1，参数2...]){
+		//函数体语句
+		return 表达式
+	
+	}
+	
+	
+	<input type = "button" value = "计算" onclick ="calcF(prompt('input a  number'))">
+	
+	字符串对象创建 [var] 字符串变量 = 字符串
+	
+	
+	创建数组
+	var 数组名 = new Array（n）
+	
+	循环 
+	for(var 变量 in 数组名){
+	循环体语句
+	}
+	

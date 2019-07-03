@@ -1,0 +1,230 @@
+
+#读取数据表中的字段内容判断与get内容是否一致
+		#get的是 html页面中input的name
+        a = request.POST.get('username')
+        b = request.POST.get('password')
+		#person为数据modle，firstname，last_name为字段名
+        exists = models.Person.objects.filter(first_name=a).exists()
+        right = models.Person.objects.filter(last_name=b).exists()
+		        context = {
+            'username': a,
+            'password': b,
+        }
+
+#将post上来的内容写入数据库
+    obj = models.Person(first_name=a, last_name=b)
+    obj.save()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#并发会出现资源竞争问题，导致库存的最终结果出现异常。
+#乐观锁
+update tb_sku set stock=2 where id=1 and stock=7;
+
+SKU.objects.filter(id=1, stock=7).update(stock=2)
+
+#任务队列
+#将下单的逻辑放到任务队列中（如celery），将并行转为串行，所有人排队下单。比如开启只有一个进程的Celery，一个订单一个订单的处理。
+
+变量标签
+在 html 文件里使用  {{ modle的类.属性}}
+块标签
+将模板渲染到序列中的元素上
+块标签是包含在{%...%}中
+block用法
+在base.html中
+{% block block_name %}
+{% endblock  %}
+以上代码中，名为 block_name 的 block 标签是可以被继承者们替换掉的部分。
+所有的 {% block block_name %} 标签告诉模板引擎，子模板可以重载这些部分。
+在其他html文件继承的时候可以使用，比如说在hello.html中
+文件代码
+{% extends "base.html" %}
+<p>继承了 base.html 文件</p>
+{% endblock %}
+注意事项：不要在模板中硬编码静态文件路径
+例如：<img src="/static/images/test.png">{{ poll.question }}</img>
+应改为
+{% load staticfiles %}   #载入django的staticfiles APP
+<img src="{% static "my_app/myexample.jpg" %}" alt="My image"/>
+
+
+分类: django
+几个大类
+render
+
+
+
+
+
+from django.db import transaction
+
+                '''悲观锁下订单（存在事务管理）'''
+                class TradeCommitView(View):
+
+                    @transaction.atomic   #装饰器的方法实现事务管理
+                    def post(self,request):
+                        '''设置保存点用于事务管理'''
+                        sid1 = transaction.savepoint()
+
+                        user = request.user
+                        if not user.is_authenticated():
+                            '''判断是否登陆'''
+                            return redirect(reverse('car:index'))
+                        # 接收数据
+                        car_id = request.POST.get('car_id')
+                        pay_method = request.POST.get('pay_style')
+                        address_id = request.POST.get('address')
+                        from datetime import datetime
+                        order_id = str(user.id) + datetime.now().strftime('%Y%m%d%H%M%S')
+                        # 运费(元)
+                        transport = 5000
+                        if not all([car_id,pay_method,address_id]):
+                            return JsonResponse({'errmsg':'数据内容不完整'})
+                        
+                        try:
+                            # car = CarDetail.objects.get(id=car_id)
+
+                            #悲观锁
+                            car = CarDetail.objects.select_for_update().get(id=car_id)
+                        except:
+                            transaction.savepoint_rollback(sid1)
+                            return HttpResponse('车辆不存在')
+
+                        service = float(car.car_price) * 10000 * 0.04
+                        if service < 3000:
+                            service = 3000
+                       
+                        add = AddressInfo.objects.get(id=address_id)
+
+                        # sid1 = transaction.savepoint()
+
+                        #创建订单
+                        try:
+                            order_new = OrderInfo.objects.create(
+                                order_id = order_id,
+                                user = user,
+                                add = add,
+                                price = car.car_price,
+                                service_charge =service,
+                                freight =transport,
+                                # status = 0,
+                                # pay_method =
+                                online_pai_method = pay_method
+                            )
+                            import time
+                            # time.sleep(30)
+                            if car.status != 1:   #如果车辆不是上线状态
+                                transaction.savepoint_rollback(sid1)   #回退到保存点
+                                return JsonResponse({'errmsg':'下单失败'})
+                            order_car =OrderCar.objects.create(
+                                oder=order_new,
+                                car_id = car,
+                                comment='')
+                            car.status = 0
+                            car.save()
+
+                        except Exception as e:
+                            transaction.savepoint_rollback(sid1)
+                            return JsonResponse({'errmsg':e})
+
+
+                        transaction.savepoint_commit(sid1)
+                        return HttpResponse('结束')
+
+'''乐观锁下订单（存在事务管理）'''
+        class TradeCommitView_le(View):
+
+            @transaction.atomic
+            def post(self, request):
+                '''设置保存点用于事务管理'''
+                sid1 = transaction.savepoint()
+
+                user = request.user
+                if not user.is_authenticated():
+                    '''判断是否登陆'''
+                    return redirect(reverse('car:index'))
+                # 接收数据
+                car_id = request.POST.get('car_id')
+                pay_method = request.POST.get('pay_style')
+                address_id = request.POST.get('address')
+                from datetime import datetime
+                order_id = str(user.id) + datetime.now().strftime('%Y%m%d%H%M%S')
+                # 运费(元)
+                transport = 5000
+                if not all([car_id, pay_method, address_id]):
+                    return HttpResponse('数据内容不完整')
+                # 校验数据的正确（作业）
+                try:
+                    car = CarDetail.objects.get(id=car_id)
+
+                except:
+                    pass
+
+                service = float(car.car_price) * 10000 * 0.04
+                if service < 3000:
+                    service = 3000
+              
+                add = AddressInfo.objects.get(id=address_id)
+
+                # sid1 = transaction.savepoint()
+
+                # 创建订单
+                try:
+                    order_new = OrderInfo.objects.create(
+                        order_id=order_id,
+                        user=user,
+                        add=add,
+                        price=car.car_price,
+                        service_charge=service,
+                        freight=transport,
+                        # status = 0,
+                        # pay_method =
+                        online_pai_method=pay_method
+                    )
+
+
+
+                    #乐观锁。不是真正意思上的锁，只是在更新前查询，如果不符合条件就回滚，符合就继续执行。
+                    res = CarDetail.objects.filter(id=car_id,status=1).update(status=0)
+                    print('res',res)
+                    if res == 0 :
+                        transaction.savepoint_rollback(sid1)
+                        return HttpResponse('车辆不存在')
+
+
+
+                    order_car = OrderCar.objects.create(
+                        oder=order_new,
+                        car_id=car,
+                        comment='')
+
+
+                except Exception as e:
+                    transaction.savepoint_rollback(sid1)
+                    return JsonResponse({'errmsg': e})
+
+                transaction.savepoint_commit(sid1)
+
+                return render(request,'trade_pay.html',context={'order_id':order_id})
+--------------------- 
+作者：sui_yi123 
+来源：CSDN 
+原文：https://blog.csdn.net/sui_yi123/article/details/83187149 
+版权声明：本文为博主原创文章，转载请附上博文链接！
